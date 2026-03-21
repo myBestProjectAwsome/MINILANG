@@ -1,3 +1,9 @@
+"""
+MiniLang Lexer - Phase 3
+Transforme le code source en tokens (mots-clés, nombres, symboles)
+Support : let, print, opérateurs arithmétiques (+, -, *, /)
+"""
+
 import ply.lex as lex
 
 
@@ -13,6 +19,12 @@ class Lexer:
         # Mots-clés
         'LET',
         'PRINT',
+        
+        # Opérateurs arithmétiques (AJOUTÉ pour Phase 3)
+        'PLUS',
+        'MINUS',
+        'MULTIPLY',
+        'DIVIDE',
         
         # Opérateurs
         'ASSIGN',
@@ -32,6 +44,12 @@ class Lexer:
     t_ASSIGN = r'='
     t_LPAREN = r'\('
     t_RPAREN = r'\)'
+    
+    # Opérateurs arithmétiques (AJOUTÉ pour Phase 3)
+    t_PLUS = r'\+'
+    t_MINUS = r'-'
+    t_MULTIPLY = r'\*'
+    t_DIVIDE = r'/'
     
     # Ignorer espaces et tabulations
     t_ignore = ' \t'
@@ -80,13 +98,13 @@ if __name__ == "__main__":
     
     # Code de test
     test_code = """
-    let x = 42
-    let y = 84
-    print(x)
-    print(y)
+    let x = 10 + 5
+    let y = x * 2
+    let z = y - 3
+    print(z)
     """
     
-    print("=== Test du Lexer - Phase 1 ===\n")
+    print("=== Test du Lexer - Phase 3 ===\n")
     print("Code source :")
     print(test_code)
     

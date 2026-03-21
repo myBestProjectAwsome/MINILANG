@@ -1,6 +1,12 @@
+"""
+MiniLang Code Generator - Phase 3
+Transforme l'AST en code C
+Support : let, print, expressions arithmétiques
+"""
+
 from parser import (
     Program, LetStatement, PrintStatement,
-    IntegerLiteral, Variable
+    IntegerLiteral, Variable, BinaryOp
 )
 
 
@@ -68,7 +74,7 @@ class CodeGenerator:
         # Générer le code pour l'expression à afficher
         expr_code = self.generate_expression(stmt.expression)
         
-        # Pour Phase 1, on suppose que tout est des entiers
+        # Pour Phase 3, on suppose que tout est des entiers
         return f'{self.indent()}printf("%d\\n", {expr_code});'
     
     def generate_expression(self, expr):
@@ -83,6 +89,13 @@ class CodeGenerator:
                 raise ValueError(f"Variable non déclarée : {expr.name}")
             return expr.name
         
+        elif isinstance(expr, BinaryOp):
+            # NOUVEAU : Opération binaire
+            left = self.generate_expression(expr.left)
+            right = self.generate_expression(expr.right)
+            # Ajouter des parenthèses pour la priorité
+            return f"({left} {expr.operator} {right})"
+        
         else:
             raise ValueError(f"Type d'expression inconnu : {type(expr)}")
 
@@ -94,13 +107,13 @@ if __name__ == "__main__":
     parser = Parser()
     
     test_code = """
-let x = 42
-let y = 84
-print(x)
-print(y)
+let x = 10 + 5
+let y = x * 2
+let z = y - 3
+print(z)
 """
     
-    print("=== Test du Générateur de Code - Phase 1 ===\n")
+    print("=== Test du Générateur de Code - Phase 3 ===\n")
     print("Code MiniLang :")
     print(test_code)
     
