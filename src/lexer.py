@@ -1,7 +1,6 @@
 """
-MiniLang Lexer - Phase 3
-Transforme le code source en tokens (mots-clés, nombres, symboles)
-Support : let, print, opérateurs arithmétiques (+, -, *, /)
+MiniLang Lexer - Phase 4
+Support : let, print, arithmétique, if/else, comparaisons
 """
 
 import ply.lex as lex
@@ -19,12 +18,22 @@ class Lexer:
         # Mots-clés
         'LET',
         'PRINT',
+        'IF',        # NOUVEAU Phase 4
+        'ELSE',      # NOUVEAU Phase 4
         
-        # Opérateurs arithmétiques (AJOUTÉ pour Phase 3)
+        # Opérateurs arithmétiques
         'PLUS',
         'MINUS',
         'MULTIPLY',
         'DIVIDE',
+        
+        # Opérateurs de comparaison (NOUVEAU Phase 4)
+        'EQ',        # ==
+        'NE',        # !=
+        'LT',        # <
+        'LE',        # <=
+        'GT',        # >
+        'GE',        # >=
         
         # Opérateurs
         'ASSIGN',
@@ -32,24 +41,39 @@ class Lexer:
         # Délimiteurs
         'LPAREN',
         'RPAREN',
+        'LBRACE',    # NOUVEAU Phase 4 : {
+        'RBRACE',    # NOUVEAU Phase 4 : }
     )
     
     # Mots-clés réservés
     reserved = {
         'let': 'LET',
         'print': 'PRINT',
+        'if': 'IF',      # NOUVEAU Phase 4
+        'else': 'ELSE',  # NOUVEAU Phase 4
     }
     
     # Règles simples (symboles)
     t_ASSIGN = r'='
     t_LPAREN = r'\('
     t_RPAREN = r'\)'
+    t_LBRACE = r'\{'   # NOUVEAU Phase 4
+    t_RBRACE = r'\}'   # NOUVEAU Phase 4
     
-    # Opérateurs arithmétiques (AJOUTÉ pour Phase 3)
+    # Opérateurs arithmétiques
     t_PLUS = r'\+'
     t_MINUS = r'-'
     t_MULTIPLY = r'\*'
     t_DIVIDE = r'/'
+    
+    # Opérateurs de comparaison (NOUVEAU Phase 4)
+    # IMPORTANT : == avant = pour éviter les conflits
+    t_EQ = r'=='
+    t_NE = r'!='
+    t_LE = r'<='
+    t_GE = r'>='
+    t_LT = r'<'
+    t_GT = r'>'
     
     # Ignorer espaces et tabulations
     t_ignore = ' \t'
@@ -98,13 +122,16 @@ if __name__ == "__main__":
     
     # Code de test
     test_code = """
-    let x = 10 + 5
-    let y = x * 2
-    let z = y - 3
-    print(z)
+    let x = 42
+    
+    if x > 10 {
+        print(1)
+    } else {
+        print(0)
+    }
     """
     
-    print("=== Test du Lexer - Phase 3 ===\n")
+    print("=== Test du Lexer - Phase 4 ===\n")
     print("Code source :")
     print(test_code)
     
