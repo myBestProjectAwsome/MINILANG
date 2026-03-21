@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# MiniLang specific
+*.pyc
+*.pyo
+parser.out
+parsetab.py
+
+# Compiled outputs
+*.o
+*.so
+*.a
+*.ll
+*.bc
+*.s
+
+# Executables (keep examples)
+hello
+arithmetic
+conditions
+loops
+test_valid
+loops_llvm
+loops_c
+hello_llvm
+*_llvm
+*_c
+
+# Generated C files
+examples/*.c
+*.c
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
