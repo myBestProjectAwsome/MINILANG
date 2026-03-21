@@ -1,6 +1,6 @@
 """
-MiniLang Parser - Phase 4
-Support : let, print, arithmétique, if/else, comparaisons
+MiniLang Parser - Phase 5
+Support : let, print, arithmétique, if/else, while, assignation
 """
 
 import ply.yacc as yacc
@@ -15,7 +15,7 @@ class ASTNode:
 
 
 class Program(ASTNode):
-    """Programme complet = liste d'instructions"""
+    """Programme complet"""
     def __init__(self, statements):
         self.statements = statements
     
@@ -24,7 +24,7 @@ class Program(ASTNode):
 
 
 class LetStatement(ASTNode):
-    """Déclaration de variable : let x = 42"""
+    """Déclaration : let x = 42"""
     def __init__(self, name, value):
         self.name = name
         self.value = value
@@ -33,8 +33,18 @@ class LetStatement(ASTNode):
         return f"Let({self.name} = {self.value})"
 
 
+class AssignStatement(ASTNode):
+    """Assignation : x = 10 (NOUVEAU Phase 5)"""
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+    
+    def __repr__(self):
+        return f"Assign({self.name} = {self.value})"
+
+
 class PrintStatement(ASTNode):
-    """Instruction print : print(x)"""
+    """Instruction : print(x)"""
     def __init__(self, expression):
         self.expression = expression
     
@@ -43,7 +53,7 @@ class PrintStatement(ASTNode):
 
 
 class IfStatement(ASTNode):
-    """Instruction if : if condition { ... } else { ... }"""
+    """Instruction : if ... else"""
     def __init__(self, condition, then_block, else_block=None):
         self.condition = condition
         self.then_block = then_block
@@ -55,8 +65,18 @@ class IfStatement(ASTNode):
         return f"If({self.condition}) Then({len(self.then_block)})"
 
 
+class WhileStatement(ASTNode):
+    """Instruction : while ... (NOUVEAU Phase 5)"""
+    def __init__(self, condition, body):
+        self.condition = condition
+        self.body = body
+    
+    def __repr__(self):
+        return f"While({self.condition}) Body({len(self.body)})"
+
+
 class IntegerLiteral(ASTNode):
-    """Littéral entier : 42"""
+    """Littéral : 42"""
     def __init__(self, value):
         self.value = value
     
@@ -65,7 +85,7 @@ class IntegerLiteral(ASTNode):
 
 
 class Variable(ASTNode):
-    """Variable : x, y, counter"""
+    """Variable : x"""
     def __init__(self, name):
         self.name = name
     
@@ -74,7 +94,7 @@ class Variable(ASTNode):
 
 
 class BinaryOp(ASTNode):
-    """Opération binaire : x + y, a > b"""
+    """Opération : x + y"""
     def __init__(self, left, operator, right):
         self.left = left
         self.operator = operator
@@ -87,29 +107,25 @@ class BinaryOp(ASTNode):
 # ============= Parser =============
 
 class Parser:
-    """Parser MiniLang - Phase 4"""
+    """Parser MiniLang - Phase 5"""
     
-    # Récupérer les tokens du lexer
     tokens = Lexer.tokens
     
-    # Priorité des opérateurs
     precedence = (
-        ('left', 'EQ', 'NE'),              # Comparaison égalité
-        ('left', 'LT', 'LE', 'GT', 'GE'),  # Comparaison ordre
-        ('left', 'PLUS', 'MINUS'),         # Addition/Soustraction
-        ('left', 'MULTIPLY', 'DIVIDE'),    # Multiplication/Division
+        ('left', 'EQ', 'NE'),
+        ('left', 'LT', 'LE', 'GT', 'GE'),
+        ('left', 'PLUS', 'MINUS'),
+        ('left', 'MULTIPLY', 'DIVIDE'),
     )
     
     def __init__(self):
         self.lexer = Lexer()
         self.parser = yacc.yacc(module=self)
     
-    # Programme = liste d'instructions
     def p_program(self, p):
         """program : statement_list"""
         p[0] = Program(p[1])
     
-    # Liste d'instructions
     def p_statement_list(self, p):
         """statement_list : statement_list statement
                          | statement"""
@@ -118,28 +134,36 @@ class Parser:
         else:
             p[0] = [p[1]]
     
-    # Instruction : let
+    # let x = 42
     def p_statement_let(self, p):
         """statement : LET IDENTIFIER ASSIGN expression"""
         p[0] = LetStatement(p[2], p[4])
     
-    # Instruction : print
+    # x = 10 (NOUVEAU Phase 5)
+    def p_statement_assign(self, p):
+        """statement : IDENTIFIER ASSIGN expression"""
+        p[0] = AssignStatement(p[1], p[3])
+    
+    # print(x)
     def p_statement_print(self, p):
         """statement : PRINT LPAREN expression RPAREN"""
         p[0] = PrintStatement(p[3])
     
-    # Instruction : if ... else (NOUVEAU Phase 4)
+    # if ... else
     def p_statement_if(self, p):
         """statement : IF expression LBRACE statement_list RBRACE
                      | IF expression LBRACE statement_list RBRACE ELSE LBRACE statement_list RBRACE"""
         if len(p) == 6:
-            # if sans else
             p[0] = IfStatement(p[2], p[4], None)
         else:
-            # if avec else
             p[0] = IfStatement(p[2], p[4], p[8])
     
-    # Expression : comparaison (NOUVEAU Phase 4)
+    # while ... (NOUVEAU Phase 5)
+    def p_statement_while(self, p):
+        """statement : WHILE expression LBRACE statement_list RBRACE"""
+        p[0] = WhileStatement(p[2], p[4])
+    
+    # Comparaisons
     def p_expression_comparison(self, p):
         """expression : expression EQ expression
                       | expression NE expression
@@ -149,7 +173,7 @@ class Parser:
                       | expression GE expression"""
         p[0] = BinaryOp(p[1], p[2], p[3])
     
-    # Expression : opération arithmétique
+    # Arithmétique
     def p_expression_binop(self, p):
         """expression : expression PLUS expression
                       | expression MINUS expression
@@ -157,22 +181,18 @@ class Parser:
                       | expression DIVIDE expression"""
         p[0] = BinaryOp(p[1], p[2], p[3])
     
-    # Expression : entier
     def p_expression_integer(self, p):
         """expression : INTEGER"""
         p[0] = IntegerLiteral(p[1])
     
-    # Expression : variable
     def p_expression_variable(self, p):
         """expression : IDENTIFIER"""
         p[0] = Variable(p[1])
     
-    # Expression : parenthèses
     def p_expression_group(self, p):
         """expression : LPAREN expression RPAREN"""
         p[0] = p[2]
     
-    # Gestion des erreurs
     def p_error(self, p):
         if p:
             print(f"❌ Erreur de syntaxe à la ligne {p.lineno}, token '{p.value}'")
@@ -180,25 +200,23 @@ class Parser:
             print("❌ Erreur de syntaxe : fin de fichier inattendue")
     
     def parse(self, code):
-        """Parse le code source et retourne l'AST"""
         return self.parser.parse(code, lexer=self.lexer.lexer)
 
 
-# Test du parser
+# Test
 if __name__ == "__main__":
     parser = Parser()
     
     test_code = """
-let x = 42
+let i = 0
 
-if x > 10 {
-    print(1)
-} else {
-    print(0)
+while i < 5 {
+    print(i)
+    i = i + 1
 }
 """
     
-    print("=== Test du Parser - Phase 4 ===\n")
+    print("=== Test du Parser - Phase 5 ===\n")
     print("Code source :")
     print(test_code)
     
@@ -210,5 +228,3 @@ if x > 10 {
         print("\nDétail des instructions :")
         for i, stmt in enumerate(ast.statements, 1):
             print(f"  {i}. {stmt}")
-    else:
-        print("\n❌ Échec du parsing")

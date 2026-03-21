@@ -1,6 +1,6 @@
 """
-MiniLang Lexer - Phase 4
-Support : let, print, arithmétique, if/else, comparaisons
+MiniLang Lexer - Phase 5
+Support : let, print, arithmétique, if/else, while
 """
 
 import ply.lex as lex
@@ -18,8 +18,9 @@ class Lexer:
         # Mots-clés
         'LET',
         'PRINT',
-        'IF',        # NOUVEAU Phase 4
-        'ELSE',      # NOUVEAU Phase 4
+        'IF',
+        'ELSE',
+        'WHILE',     # NOUVEAU Phase 5
         
         # Opérateurs arithmétiques
         'PLUS',
@@ -27,13 +28,13 @@ class Lexer:
         'MULTIPLY',
         'DIVIDE',
         
-        # Opérateurs de comparaison (NOUVEAU Phase 4)
-        'EQ',        # ==
-        'NE',        # !=
-        'LT',        # <
-        'LE',        # <=
-        'GT',        # >
-        'GE',        # >=
+        # Opérateurs de comparaison
+        'EQ',
+        'NE',
+        'LT',
+        'LE',
+        'GT',
+        'GE',
         
         # Opérateurs
         'ASSIGN',
@@ -41,24 +42,25 @@ class Lexer:
         # Délimiteurs
         'LPAREN',
         'RPAREN',
-        'LBRACE',    # NOUVEAU Phase 4 : {
-        'RBRACE',    # NOUVEAU Phase 4 : }
+        'LBRACE',
+        'RBRACE',
     )
     
     # Mots-clés réservés
     reserved = {
         'let': 'LET',
         'print': 'PRINT',
-        'if': 'IF',      # NOUVEAU Phase 4
-        'else': 'ELSE',  # NOUVEAU Phase 4
+        'if': 'IF',
+        'else': 'ELSE',
+        'while': 'WHILE',  # NOUVEAU Phase 5
     }
     
     # Règles simples (symboles)
     t_ASSIGN = r'='
     t_LPAREN = r'\('
     t_RPAREN = r'\)'
-    t_LBRACE = r'\{'   # NOUVEAU Phase 4
-    t_RBRACE = r'\}'   # NOUVEAU Phase 4
+    t_LBRACE = r'\{'
+    t_RBRACE = r'\}'
     
     # Opérateurs arithmétiques
     t_PLUS = r'\+'
@@ -66,8 +68,7 @@ class Lexer:
     t_MULTIPLY = r'\*'
     t_DIVIDE = r'/'
     
-    # Opérateurs de comparaison (NOUVEAU Phase 4)
-    # IMPORTANT : == avant = pour éviter les conflits
+    # Opérateurs de comparaison
     t_EQ = r'=='
     t_NE = r'!='
     t_LE = r'<='
@@ -120,18 +121,16 @@ class Lexer:
 if __name__ == "__main__":
     lexer = Lexer()
     
-    # Code de test
     test_code = """
-    let x = 42
+    let i = 0
     
-    if x > 10 {
-        print(1)
-    } else {
-        print(0)
+    while i < 5 {
+        print(i)
+        i = i + 1
     }
     """
     
-    print("=== Test du Lexer - Phase 4 ===\n")
+    print("=== Test du Lexer - Phase 5 ===\n")
     print("Code source :")
     print(test_code)
     
