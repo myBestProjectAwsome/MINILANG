@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'ASSIGN IDENTIFIER INTEGER LET LPAREN PRINT RPARENprogram : statement_liststatement_list : statement_list statement\n                         | statementstatement : LET IDENTIFIER ASSIGN expressionstatement : PRINT LPAREN expression RPARENexpression : INTEGERexpression : IDENTIFIER'
+_lr_signature = 'leftPLUSMINUSleftMULTIPLYDIVIDEASSIGN DIVIDE IDENTIFIER INTEGER LET LPAREN MINUS MULTIPLY PLUS PRINT RPARENprogram : statement_liststatement_list : statement_list statement\n                         | statementstatement : LET IDENTIFIER ASSIGN expressionstatement : PRINT LPAREN expression RPARENexpression : expression PLUS expression\n                      | expression MINUS expression\n                      | expression MULTIPLY expression\n                      | expression DIVIDE expressionexpression : INTEGERexpression : IDENTIFIERexpression : LPAREN expression RPAREN'
     
-_lr_action_items = {'LET':([0,2,3,6,11,12,13,14,],[4,4,-3,-2,-6,-7,-4,-5,]),'PRINT':([0,2,3,6,11,12,13,14,],[5,5,-3,-2,-6,-7,-4,-5,]),'$end':([1,2,3,6,11,12,13,14,],[0,-1,-3,-2,-6,-7,-4,-5,]),'IDENTIFIER':([4,8,9,],[7,12,12,]),'LPAREN':([5,],[8,]),'ASSIGN':([7,],[9,]),'INTEGER':([8,9,],[11,11,]),'RPAREN':([10,11,12,],[14,-6,-7,]),}
+_lr_action_items = {'LET':([0,2,3,6,12,13,14,16,21,22,23,24,25,],[4,4,-3,-2,-10,-11,-4,-5,-12,-6,-7,-8,-9,]),'PRINT':([0,2,3,6,12,13,14,16,21,22,23,24,25,],[5,5,-3,-2,-10,-11,-4,-5,-12,-6,-7,-8,-9,]),'$end':([1,2,3,6,12,13,14,16,21,22,23,24,25,],[0,-1,-3,-2,-10,-11,-4,-5,-12,-6,-7,-8,-9,]),'IDENTIFIER':([4,8,9,10,17,18,19,20,],[7,13,13,13,13,13,13,13,]),'LPAREN':([5,8,9,10,17,18,19,20,],[8,10,10,10,10,10,10,10,]),'ASSIGN':([7,],[9,]),'INTEGER':([8,9,10,17,18,19,20,],[12,12,12,12,12,12,12,]),'RPAREN':([11,12,13,15,21,22,23,24,25,],[16,-10,-11,21,-12,-6,-7,-8,-9,]),'PLUS':([11,12,13,14,15,21,22,23,24,25,],[17,-10,-11,17,17,-12,-6,-7,-8,-9,]),'MINUS':([11,12,13,14,15,21,22,23,24,25,],[18,-10,-11,18,18,-12,-6,-7,-8,-9,]),'MULTIPLY':([11,12,13,14,15,21,22,23,24,25,],[19,-10,-11,19,19,-12,19,19,-8,-9,]),'DIVIDE':([11,12,13,14,15,21,22,23,24,25,],[20,-10,-11,20,20,-12,20,20,-8,-9,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'program':([0,],[1,]),'statement_list':([0,],[2,]),'statement':([0,2,],[3,6,]),'expression':([8,9,],[10,13,]),}
+_lr_goto_items = {'program':([0,],[1,]),'statement_list':([0,],[2,]),'statement':([0,2,],[3,6,]),'expression':([8,9,10,17,18,19,20,],[11,14,15,22,23,24,25,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -27,11 +27,16 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S' -> program","S'",1,None,None,None),
-  ('program -> statement_list','program',1,'p_program','parser.py',72),
-  ('statement_list -> statement_list statement','statement_list',2,'p_statement_list','parser.py',77),
-  ('statement_list -> statement','statement_list',1,'p_statement_list','parser.py',78),
-  ('statement -> LET IDENTIFIER ASSIGN expression','statement',4,'p_statement_let','parser.py',88),
-  ('statement -> PRINT LPAREN expression RPAREN','statement',4,'p_statement_print','parser.py',93),
-  ('expression -> INTEGER','expression',1,'p_expression_integer','parser.py',98),
-  ('expression -> IDENTIFIER','expression',1,'p_expression_variable','parser.py',103),
+  ('program -> statement_list','program',1,'p_program','parser.py',95),
+  ('statement_list -> statement_list statement','statement_list',2,'p_statement_list','parser.py',100),
+  ('statement_list -> statement','statement_list',1,'p_statement_list','parser.py',101),
+  ('statement -> LET IDENTIFIER ASSIGN expression','statement',4,'p_statement_let','parser.py',111),
+  ('statement -> PRINT LPAREN expression RPAREN','statement',4,'p_statement_print','parser.py',116),
+  ('expression -> expression PLUS expression','expression',3,'p_expression_binop','parser.py',121),
+  ('expression -> expression MINUS expression','expression',3,'p_expression_binop','parser.py',122),
+  ('expression -> expression MULTIPLY expression','expression',3,'p_expression_binop','parser.py',123),
+  ('expression -> expression DIVIDE expression','expression',3,'p_expression_binop','parser.py',124),
+  ('expression -> INTEGER','expression',1,'p_expression_integer','parser.py',129),
+  ('expression -> IDENTIFIER','expression',1,'p_expression_variable','parser.py',134),
+  ('expression -> LPAREN expression RPAREN','expression',3,'p_expression_group','parser.py',139),
 ]

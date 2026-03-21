@@ -1,3 +1,9 @@
+"""
+MiniLang Parser - Phase 3
+Transforme les tokens en AST (Abstract Syntax Tree)
+Support : let, print, expressions arithmétiques (+, -, *, /)
+"""
+
 import ply.yacc as yacc
 from lexer import Lexer
 
@@ -55,13 +61,30 @@ class Variable(ASTNode):
         return f"Var({self.name})"
 
 
+class BinaryOp(ASTNode):
+    """Opération binaire : x + y, a * b"""
+    def __init__(self, left, operator, right):
+        self.left = left
+        self.operator = operator
+        self.right = right
+    
+    def __repr__(self):
+        return f"BinOp({self.left} {self.operator} {self.right})"
+
+
 # ============= Parser =============
 
 class Parser:
-    """Parser MiniLang - Phase 1"""
+    """Parser MiniLang - Phase 3"""
     
     # Récupérer les tokens du lexer
     tokens = Lexer.tokens
+    
+    # Priorité des opérateurs (du moins au plus prioritaire)
+    precedence = (
+        ('left', 'PLUS', 'MINUS'),
+        ('left', 'MULTIPLY', 'DIVIDE'),
+    )
     
     def __init__(self):
         self.lexer = Lexer()
@@ -93,6 +116,14 @@ class Parser:
         """statement : PRINT LPAREN expression RPAREN"""
         p[0] = PrintStatement(p[3])
     
+    # Expression : opération binaire
+    def p_expression_binop(self, p):
+        """expression : expression PLUS expression
+                      | expression MINUS expression
+                      | expression MULTIPLY expression
+                      | expression DIVIDE expression"""
+        p[0] = BinaryOp(p[1], p[2], p[3])
+    
     # Expression : un nombre entier
     def p_expression_integer(self, p):
         """expression : INTEGER"""
@@ -102,6 +133,11 @@ class Parser:
     def p_expression_variable(self, p):
         """expression : IDENTIFIER"""
         p[0] = Variable(p[1])
+    
+    # Expression : parenthèses (pour la priorité)
+    def p_expression_group(self, p):
+        """expression : LPAREN expression RPAREN"""
+        p[0] = p[2]
     
     # Gestion des erreurs de syntaxe
     def p_error(self, p):
@@ -120,13 +156,13 @@ if __name__ == "__main__":
     parser = Parser()
     
     test_code = """
-let x = 42
-let y = 84
-print(x)
-print(y)
+let x = 10 + 5
+let y = x * 2
+let z = y - 3
+print(z)
 """
     
-    print("=== Test du Parser - Phase 1 ===\n")
+    print("=== Test du Parser - Phase 3 ===\n")
     print("Code source :")
     print(test_code)
     
