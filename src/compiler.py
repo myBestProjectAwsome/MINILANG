@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""
+MiniLang Compiler - Phase 6
+Pipeline : Lexer → Parser → Analyse Sémantique → CodeGen → GCC
+"""
 
 import sys
 import os
@@ -7,29 +11,21 @@ import argparse
 
 from lexer import Lexer
 from parser import Parser
+from semantic import SemanticAnalyzer
 from codegen import CodeGenerator
 
 
 class Compiler:
-    """Compilateur MiniLang complet"""
+    """Compilateur MiniLang complet avec analyse sémantique"""
     
     def __init__(self):
         self.lexer = Lexer()
         self.parser = Parser()
+        self.semantic_analyzer = SemanticAnalyzer()
         self.codegen = CodeGenerator()
     
     def compile(self, source_file, output_file=None, verbose=False):
-        """
-        Compile un fichier .ml en exécutable
-        
-        Args:
-            source_file: Chemin vers le fichier .ml
-            output_file: Nom de l'exécutable (optionnel)
-            verbose: Afficher les détails (True/False)
-        
-        Returns:
-            True si succès, False sinon
-        """
+        """Compile un fichier .ml en exécutable"""
         
         # 1. Lire le fichier source
         if verbose:
@@ -67,7 +63,31 @@ class Compiler:
         if verbose:
             print(f"✓ AST généré avec {len(ast.statements)} instructions\n")
         
-        # 4. Génération de code C
+        # 4. Analyse sémantique (NOUVEAU Phase 6 !)
+        if verbose:
+            print("🔍 Analyse sémantique (vérification de sécurité)...")
+        
+        errors, warnings = self.semantic_analyzer.analyze(ast)
+        
+        # Afficher les avertissements
+        if warnings:
+            print("\n🟡 AVERTISSEMENTS :")
+            for warning in warnings:
+                print(f"  {warning}")
+            print()
+        
+        # Si erreurs, arrêter la compilation
+        if errors:
+            print("\n🔴 ERREURS DÉTECTÉES :")
+            for error in errors:
+                print(f"  {error}")
+            print("\n❌ Compilation annulée (corrigez les erreurs ci-dessus)\n")
+            return False
+        
+        if verbose:
+            print(f"✓ Aucune erreur sémantique détectée\n")
+        
+        # 5. Génération de code C
         if verbose:
             print("⚙️  Génération de code C...")
         
@@ -80,7 +100,7 @@ class Compiler:
         if verbose:
             print(f"✓ Code C généré ({len(c_code)} caractères)\n")
         
-        # 5. Sauvegarder le code C temporaire
+        # 6. Sauvegarder le code C
         c_file = source_file.replace('.ml', '.c')
         
         try:
@@ -93,7 +113,7 @@ class Compiler:
         if verbose:
             print(f"💾 Code C sauvegardé : {c_file}\n")
         
-        # 6. Compiler avec GCC
+        # 7. Compiler avec GCC
         if output_file is None:
             output_file = source_file.replace('.ml', '')
         
@@ -120,7 +140,7 @@ class Compiler:
             print("                    ou : brew install gcc (Mac)")
             return False
         
-        # 7. Succès !
+        # 8. Succès !
         print(f"✅ Compilation réussie !")
         print(f"   Exécutable : {output_file}")
         print(f"   Exécutez avec : ./{output_file}")
@@ -132,7 +152,7 @@ def main():
     """Point d'entrée du compilateur"""
     
     parser = argparse.ArgumentParser(
-        description='MiniLang Compiler - Phase 1',
+        description='MiniLang Compiler - Phase 6 (avec analyse sémantique)',
         epilog='Exemple : python compiler.py ../examples/hello.ml -o hello'
     )
     
